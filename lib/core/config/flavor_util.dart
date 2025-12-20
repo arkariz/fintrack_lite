@@ -1,4 +1,4 @@
-import 'package:fintrack_lite/core/config/app_config.dart';
+import 'package:health_duel/core/config/app_config.dart';
 
 class FlavorUtil {
   static Environment getFlavorFromEnv() {

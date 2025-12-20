@@ -1,4 +1,4 @@
-import 'package:fintrack_lite/core/di/core_module.dart';
+import 'package:health_duel/core/di/core_module.dart';
 import 'package:get_it/get_it.dart';
 
 /// GetIt instance - Service Locator for Dependency Injection

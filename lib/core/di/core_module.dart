@@ -1,5 +1,5 @@
 import 'package:exception/exception.dart';
-import 'package:fintrack_lite/core/core.dart';
+import 'package:health_duel/core/core.dart';
 import 'package:network/network.dart';
 import 'package:security/security.dart';
 import 'package:storage/storage.dart';

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:exception/exception.dart';
-import 'package:fintrack_lite/core/error/error.dart';
+import 'package:health_duel/core/error/error.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

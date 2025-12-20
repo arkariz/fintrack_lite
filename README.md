@@ -1,4 +1,4 @@
-# fintrack_lite
+# health_duel
 
 A new Flutter project.
 

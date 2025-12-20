@@ -1,5 +1,5 @@
 import 'package:exception/exception.dart';
-import 'package:fintrack_lite/core/error/failures.dart';
+import 'package:health_duel/core/error/failures.dart';
 
 /// Maps CoreException from infrastructure to domain Failure types
 ///

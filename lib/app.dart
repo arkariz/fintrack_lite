@@ -1,5 +1,5 @@
-import 'package:fintrack_lite/core/config/config.dart';
-import 'package:fintrack_lite/core/theme/app_theme.dart';
+import 'package:health_duel/core/config/config.dart';
+import 'package:health_duel/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 import 'core/router/app_router.dart';

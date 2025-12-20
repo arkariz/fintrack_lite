@@ -1,4 +1,4 @@
-import 'package:fintrack_lite/core/utils/utils.dart';
+import 'package:health_duel/core/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Home Screen - Main entry point

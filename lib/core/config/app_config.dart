@@ -1,5 +1,5 @@
-import 'package:fintrack_lite/core/config/env/env_variables.dart';
-import 'package:fintrack_lite/core/config/env/flavors.dart';
+import 'package:health_duel/core/config/env/env_variables.dart';
+import 'package:health_duel/core/config/env/flavors.dart';
 
 /// Environment Flavor Enum
 enum Environment { dev, prod }

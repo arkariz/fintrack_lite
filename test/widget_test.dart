@@ -1,4 +1,4 @@
-import 'package:fintrack_lite/app.dart';
+import 'package:health_duel/app.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

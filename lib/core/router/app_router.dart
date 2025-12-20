@@ -1,5 +1,5 @@
 
-import 'package:fintrack_lite/features/home/home.dart';
+import 'package:health_duel/features/home/home.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(

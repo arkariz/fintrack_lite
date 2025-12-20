@@ -1,6 +1,6 @@
 {
-    "name": "fintrack_lite",
-    "short_name": "fintrack_lite",
+    "name": "health_duel",
+    "short_name": "health_duel",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
