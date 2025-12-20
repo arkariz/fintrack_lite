@@ -1,4 +1,7 @@
+import 'package:fintrack_lite/core/config/config.dart';
+import 'package:fintrack_lite/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+
 import 'core/router/app_router.dart';
 
 class FinTrackApp extends StatelessWidget {
@@ -7,11 +10,15 @@ class FinTrackApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'FinTrack Lite',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: AppConfig.env.appName,
+      debugShowCheckedModeBanner: AppConfig.env.isDebug,
+      
+      // Theme Configuration
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system, // Follow system theme
+      
+      // Routing
       routerConfig: appRouter,
     );
   }
