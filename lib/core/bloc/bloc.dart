@@ -25,3 +25,5 @@ export 'effect/navigation/navigate_replace_effect.dart';
 
 export 'effect/effect_handlers.dart';
 export 'effect/effect_registry.dart';
+
+export 'observer/app_bloc_observer.dart';

@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
-import 'package:health_duel/core/bloc/bloc.dart';
 import 'package:health_duel/core/di/core_module.dart';
 import 'package:health_duel/features/auth/di/auth_module.dart';
 import 'package:health_duel/core/config/firebase_options.dart';
@@ -33,7 +32,6 @@ Future<void> initializeDependencies() async {
 
   // 1. Initialize Core Infrastructure (Storage, Network, Security)
   await registerCoreModule();
-  setupEffectHandlers();
 
   // Wait for all async registrations to complete
   await getIt.allReady();
