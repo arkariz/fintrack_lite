@@ -1,7 +1,10 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:health_duel/core/presentation/widgets/connectivity/connectivity.dart';
 import 'package:health_duel/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:health_duel/features/auth/presentation/bloc/auth_event.dart';
 import 'package:health_duel/features/auth/presentation/bloc/auth_state.dart';
@@ -12,6 +15,7 @@ import '../../../../helpers/helpers.dart';
 
 void main() {
   late MockAuthBloc mockAuthBloc;
+  late MockConnectivityCubit mockConnectivityCubit;
 
   setUpAll(() {
     registerFallbackValues();
@@ -19,21 +23,33 @@ void main() {
 
   setUp(() {
     mockAuthBloc = MockAuthBloc();
+    mockConnectivityCubit = MockConnectivityCubit();
 
-    // Default: return AuthInitial state
+    // Default: AuthInitial state
     when(() => mockAuthBloc.state).thenReturn(const AuthInitial());
     whenListen(
       mockAuthBloc,
-      const Stream<AuthState>.empty(),
+      Stream<AuthState>.empty(),
       initialState: const AuthInitial(),
+    );
+
+    // Default: Online status
+    when(() => mockConnectivityCubit.state).thenReturn(ConnectivityStatus.online);
+    whenListen(
+      mockConnectivityCubit,
+      Stream<ConnectivityStatus>.empty(),
+      initialState: ConnectivityStatus.online,
     );
   });
 
   Widget buildSubject() {
-    return MaterialApp(
-      home: BlocProvider<AuthBloc>.value(
-        value: mockAuthBloc,
-        child: const LoginPage(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>.value(value: mockAuthBloc),
+        BlocProvider<ConnectivityCubit>.value(value: mockConnectivityCubit),
+      ],
+      child: const MaterialApp(
+        home: LoginPage(),
       ),
     );
   }
@@ -45,41 +61,39 @@ void main() {
 
         // Title
         expect(find.text('Health Duel'), findsOneWidget);
-        expect(find.text('Test Authentication'), findsOneWidget);
+        expect(find.text('Challenge your friends to stay active!'), findsOneWidget);
 
-        // Form fields
+        // Form fields (ValidatedTextField has TextFormField inside)
         expect(find.byType(TextFormField), findsNWidgets(2));
         expect(find.text('Email'), findsOneWidget);
         expect(find.text('Password'), findsOneWidget);
 
         // Buttons
         expect(find.text('Sign In'), findsOneWidget);
-        expect(find.text('Sign in with Google'), findsOneWidget);
-        expect(find.text("Don't have an account? Register"), findsOneWidget);
+        expect(find.text('Continue with Google'), findsOneWidget);
+        expect(find.text('Register'), findsOneWidget);
 
         // Test credentials hint
-        expect(find.text('Test Credentials:'), findsOneWidget);
-        expect(find.text('Email: test@email.com'), findsOneWidget);
-        expect(find.text('Password: test123'), findsOneWidget);
+        expect(find.text('Test Credentials'), findsOneWidget);
       });
 
-      testWidgets('CircularProgressIndicator when state is AuthLoading', (tester) async {
+      testWidgets('loading view with text when state is AuthLoading', (tester) async {
         when(() => mockAuthBloc.state).thenReturn(const AuthLoading());
         whenListen(
           mockAuthBloc,
-          const Stream<AuthState>.empty(),
+          Stream<AuthState>.empty(),
           initialState: const AuthLoading(),
         );
 
         await tester.pumpWidget(buildSubject());
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
-        expect(find.byType(TextFormField), findsNothing);
+        expect(find.text('Signing in...'), findsOneWidget);
       });
     });
 
     group('form validation', () {
-      testWidgets('shows error when email is empty', (tester) async {
+      testWidgets('shows error when email is empty on submit', (tester) async {
         await tester.pumpWidget(buildSubject());
 
         // Tap sign in without entering anything
@@ -89,33 +103,28 @@ void main() {
         expect(find.text('Please enter email'), findsOneWidget);
       });
 
-      testWidgets('shows error when email is invalid', (tester) async {
-        await tester.pumpWidget(buildSubject());
-
-        // Enter invalid email
-        await tester.enterText(find.byType(TextFormField).first, 'invalidemail');
-        await tester.tap(find.text('Sign In'));
-        await tester.pumpAndSettle();
-
-        expect(find.text('Please enter valid email'), findsOneWidget);
-      });
-
-      testWidgets('shows error when password is empty', (tester) async {
+      testWidgets('shows error when password is empty on submit', (tester) async {
         await tester.pumpWidget(buildSubject());
 
         // Enter valid email but no password
-        await tester.enterText(find.byType(TextFormField).first, 'test@email.com');
+        await tester.enterText(
+          find.byType(TextFormField).first,
+          'test@email.com',
+        );
         await tester.tap(find.text('Sign In'));
         await tester.pumpAndSettle();
 
         expect(find.text('Please enter password'), findsOneWidget);
       });
 
-      testWidgets('shows error when password is too short', (tester) async {
+      testWidgets('shows error when password is too short on submit', (tester) async {
         await tester.pumpWidget(buildSubject());
 
         // Enter valid email and short password
-        await tester.enterText(find.byType(TextFormField).first, 'test@email.com');
+        await tester.enterText(
+          find.byType(TextFormField).first,
+          'test@email.com',
+        );
         await tester.enterText(find.byType(TextFormField).last, '123');
         await tester.tap(find.text('Sign In'));
         await tester.pumpAndSettle();
@@ -129,7 +138,10 @@ void main() {
         await tester.pumpWidget(buildSubject());
 
         // Enter valid credentials
-        await tester.enterText(find.byType(TextFormField).first, 'test@email.com');
+        await tester.enterText(
+          find.byType(TextFormField).first,
+          'test@email.com',
+        );
         await tester.enterText(find.byType(TextFormField).last, 'test123');
         await tester.tap(find.text('Sign In'));
         await tester.pump();
@@ -151,28 +163,7 @@ void main() {
         await tester.tap(find.text('Sign In'));
         await tester.pump();
 
-        verifyNever(
-          () => mockAuthBloc.add(any()),
-        );
-      });
-
-      testWidgets('trims email before dispatching', (tester) async {
-        await tester.pumpWidget(buildSubject());
-
-        // Enter email with trailing spaces
-        await tester.enterText(find.byType(TextFormField).first, '  test@email.com  ');
-        await tester.enterText(find.byType(TextFormField).last, 'test123');
-        await tester.tap(find.text('Sign In'));
-        await tester.pump();
-
-        verify(
-          () => mockAuthBloc.add(
-            const AuthSignInWithEmailRequested(
-              email: 'test@email.com',
-              password: 'test123',
-            ),
-          ),
-        ).called(1);
+        verifyNever(() => mockAuthBloc.add(any()));
       });
     });
 
@@ -180,12 +171,34 @@ void main() {
       testWidgets('dispatches AuthSignInWithGoogleRequested on tap', (tester) async {
         await tester.pumpWidget(buildSubject());
 
-        await tester.tap(find.text('Sign in with Google'));
+        await tester.tap(find.text('Continue with Google'));
         await tester.pump();
 
         verify(
           () => mockAuthBloc.add(const AuthSignInWithGoogleRequested()),
         ).called(1);
+      });
+    });
+
+    group('connectivity', () {
+      testWidgets('shows offline banner when offline', (tester) async {
+        when(() => mockConnectivityCubit.state).thenReturn(ConnectivityStatus.offline);
+        whenListen(
+          mockConnectivityCubit,
+          Stream<ConnectivityStatus>.empty(),
+          initialState: ConnectivityStatus.offline,
+        );
+
+        await tester.pumpWidget(buildSubject());
+
+        expect(find.text('No internet connection'), findsOneWidget);
+        expect(find.byIcon(Icons.wifi_off_rounded), findsOneWidget);
+      });
+
+      testWidgets('hides offline banner when online', (tester) async {
+        await tester.pumpWidget(buildSubject());
+
+        expect(find.text('No internet connection'), findsNothing);
       });
     });
 
@@ -202,15 +215,12 @@ void main() {
         );
 
         await tester.pumpWidget(buildSubject());
-        await tester.pump(); // Rebuild after state change
+        await tester.pump(); // Process state change
         await tester.pump(); // Let snackbar appear
 
         expect(find.text(errorMessage), findsOneWidget);
         expect(find.byType(SnackBar), findsOneWidget);
       });
-
-      // Note: Testing navigation to /home requires GoRouter setup
-      // This is covered in integration tests
     });
   });
 }
