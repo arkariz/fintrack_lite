@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:health_duel/core/config/config.dart';
 import 'package:health_duel/core/di/injection.dart';
+import 'package:health_duel/core/presentation/widgets/connectivity/connectivity.dart';
 import 'package:health_duel/core/theme/app_theme.dart';
 import 'package:health_duel/features/auth/presentation/bloc/auth_bloc.dart';
 
@@ -11,10 +12,12 @@ class HealthDuelApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use BlocProvider.value since AuthBloc is a singleton from DI
-    // AuthCheckRequested is dispatched once in main.dart
-    return BlocProvider.value(
-      value: getIt<AuthBloc>(),
+    // Provide both AuthBloc and ConnectivityCubit as singletons from DI
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<AuthBloc>()),
+        BlocProvider.value(value: getIt<ConnectivityCubit>()),
+      ],
       child: MaterialApp.router(
         title: AppConfig.env.appName,
         debugShowCheckedModeBanner: AppConfig.env.isDebug,

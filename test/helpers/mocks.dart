@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:health_duel/core/error/failures.dart';
+import 'package:health_duel/core/presentation/widgets/connectivity/connectivity.dart';
 import 'package:health_duel/features/auth/domain/entities/user.dart';
 import 'package:health_duel/features/auth/domain/repositories/auth_repository.dart';
 import 'package:health_duel/features/auth/domain/usecases/get_current_user.dart';
@@ -58,6 +59,10 @@ class MockGetCurrentUser extends Mock implements GetCurrentUser {}
 /// );
 /// ```
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
+
+/// Mock ConnectivityCubit for widget testing
+class MockConnectivityCubit extends MockCubit<ConnectivityStatus>
+    implements ConnectivityCubit {}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Fallback Values
