@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'extensions/extensions.dart';
+import 'tokens/tokens.dart';
+
 /// Application Theme Configuration
 ///
 /// Provides centralized theme management for Light and Dark modes.
@@ -44,6 +47,11 @@ class AppTheme {
         onError: Colors.white,
       ),
       scaffoldBackgroundColor: lightBackground,
+
+      // Theme Extensions (ADR-005)
+      extensions: const <ThemeExtension<dynamic>>[
+        AppColorsExtension.light,
+      ],
       
       // Typography
       textTheme: _buildTextTheme(lightOnSurface),
@@ -65,7 +73,7 @@ class AppTheme {
       cardTheme: CardTheme(
         elevation: 1,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
         ),
         color: lightSurface,
       ),
@@ -75,24 +83,24 @@ class AppTheme {
         filled: true,
         fillColor: lightSurface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: errorColor),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.md,
         ),
       ),
       
@@ -100,9 +108,12 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.lgBorder,
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 16,
@@ -110,12 +121,15 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.lgBorder,
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 16,
@@ -123,12 +137,15 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.lgBorder,
           ),
           side: const BorderSide(color: primaryColor),
           textStyle: GoogleFonts.inter(
@@ -137,7 +154,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Floating Action Button
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         elevation: 2,
@@ -170,7 +187,12 @@ class AppTheme {
         onError: Colors.white,
       ),
       scaffoldBackgroundColor: darkBackground,
-      
+
+      // Theme Extensions (ADR-005)
+      extensions: const <ThemeExtension<dynamic>>[
+        AppColorsExtension.dark,
+      ],
+
       // Typography
       textTheme: _buildTextTheme(darkOnSurface),
       
@@ -191,44 +213,47 @@ class AppTheme {
       cardTheme: CardTheme(
         elevation: 1,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
         ),
         color: darkSurface,
       ),
-      
+
       // Input Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: darkSurface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: Color(0xFF374151)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: Color(0xFF374151)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lgBorder,
           borderSide: const BorderSide(color: errorColor),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.md,
         ),
       ),
-      
+
       // Button Themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.lgBorder,
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 16,
@@ -236,12 +261,15 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.lgBorder,
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 16,
@@ -249,12 +277,15 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppRadius.lgBorder,
           ),
           side: const BorderSide(color: primaryColor),
           textStyle: GoogleFonts.inter(
@@ -263,14 +294,14 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Floating Action Button
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         elevation: 2,
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
       ),
-      
+
       // Divider
       dividerTheme: const DividerThemeData(
         color: Color(0xFF374151),
