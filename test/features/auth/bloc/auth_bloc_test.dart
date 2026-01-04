@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:health_duel/core/bloc/bloc.dart';
 import 'package:health_duel/core/error/failures.dart';
 import 'package:health_duel/features/auth/domain/entities/user.dart';
 import 'package:health_duel/features/auth/presentation/bloc/auth_bloc.dart';
@@ -54,6 +55,13 @@ void main() {
     getCurrentUser: mockGetCurrentUser,
   );
 
+  /// Matcher that ignores effect property in state comparison
+  Matcher isAuthLoading({String? message}) => isA<AuthLoading>().having((s) => s.message, 'message', message);
+
+  Matcher isAuthAuthenticated(User user) => isA<AuthAuthenticated>().having((s) => s.user, 'user', user);
+
+  Matcher isAuthUnauthenticated() => isA<AuthUnauthenticated>();
+
   group('AuthBloc', () {
     test('initial state is AuthInitial', () {
       expect(buildBloc().state, const AuthInitial());
@@ -67,10 +75,7 @@ void main() {
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthCheckRequested()),
-        expect: () => [
-          const AuthLoading(),
-          AuthAuthenticated(tUser),
-        ],
+        expect: () => [isAuthLoading(message: 'Checking authentication...'), isAuthAuthenticated(tUser)],
         verify: (_) {
           // Verify use case was called
         },
@@ -83,217 +88,189 @@ void main() {
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthCheckRequested()),
-        expect: () => [
-          const AuthLoading(),
-          const AuthUnauthenticated(),
-        ],
+        expect: () => [isAuthLoading(message: 'Checking authentication...'), isAuthUnauthenticated()],
       );
 
       blocTest<AuthBloc, AuthState>(
         'emits [AuthLoading, AuthUnauthenticated] on failure',
         build: () {
-          mockGetCurrentUser.setupFailure(
-            const ServerFailure(message: 'Server error'),
-          );
+          mockGetCurrentUser.setupFailure(const ServerFailure(message: 'Server error'));
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthCheckRequested()),
-        expect: () => [
-          const AuthLoading(),
-          const AuthUnauthenticated(),
-        ],
+        expect: () => [isAuthLoading(message: 'Checking authentication...'), isAuthUnauthenticated()],
       );
     });
 
     group('AuthSignInWithEmailRequested', () {
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthAuthenticated] on success',
+        'emits [AuthLoading, AuthAuthenticated] with NavigateToHome effect on success',
         build: () {
           mockSignInWithEmail.setupSuccess(tUser);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(
-          const AuthSignInWithEmailRequested(
-            email: tEmail,
-            password: tPassword,
-          ),
-        ),
-        expect: () => [
-          const AuthLoading(),
-          AuthAuthenticated(tUser),
-        ],
+        act: (bloc) => bloc.add(const AuthSignInWithEmailRequested(email: tEmail, password: tPassword)),
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in...'),
+              isA<AuthAuthenticated>()
+                  .having((s) => s.user, 'user', tUser)
+                  .having((s) => s.effect, 'effect', isA<NavigateGoEffect>()),
+            ],
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthError] on failure',
+        'emits [AuthLoading, AuthUnauthenticated] with ShowError effect on failure',
         build: () {
-          mockSignInWithEmail.setupFailure(
-            const AuthFailure(message: tAuthErrorMessage),
-          );
+          mockSignInWithEmail.setupFailure(const AuthFailure(message: tAuthErrorMessage));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(
-          const AuthSignInWithEmailRequested(
-            email: tEmail,
-            password: tPassword,
-          ),
-        ),
-        expect: () => [
-          const AuthLoading(),
-          const AuthError(tAuthErrorMessage),
-        ],
+        act: (bloc) => bloc.add(const AuthSignInWithEmailRequested(email: tEmail, password: tPassword)),
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthError] on network failure',
+        'emits [AuthLoading, AuthUnauthenticated] with ShowError effect on network failure',
         build: () {
-          mockSignInWithEmail.setupFailure(
-            const NetworkFailure(message: tNetworkErrorMessage),
-          );
+          mockSignInWithEmail.setupFailure(const NetworkFailure(message: tNetworkErrorMessage));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(
-          const AuthSignInWithEmailRequested(
-            email: tEmail,
-            password: tPassword,
-          ),
-        ),
-        expect: () => [
-          const AuthLoading(),
-          const AuthError(tNetworkErrorMessage),
-        ],
+        act: (bloc) => bloc.add(const AuthSignInWithEmailRequested(email: tEmail, password: tPassword)),
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
     });
 
     group('AuthSignInWithGoogleRequested', () {
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthAuthenticated] on success',
+        'emits [AuthLoading, AuthAuthenticated] with NavigateToHome effect on success',
         build: () {
           mockSignInWithGoogle.setupSuccess(tUser);
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthSignInWithGoogleRequested()),
-        expect: () => [
-          const AuthLoading(),
-          AuthAuthenticated(tUser),
-        ],
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in with Google...'),
+              isA<AuthAuthenticated>()
+                  .having((s) => s.user, 'user', tUser)
+                  .having((s) => s.effect, 'effect', isA<NavigateGoEffect>()),
+            ],
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthError] on failure',
+        'emits [AuthLoading, AuthUnauthenticated] with ShowError effect on failure',
         build: () {
-          mockSignInWithGoogle.setupFailure(
-            const AuthFailure(message: 'Google sign in cancelled'),
-          );
+          mockSignInWithGoogle.setupFailure(const AuthFailure(message: 'Google sign in cancelled'));
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthSignInWithGoogleRequested()),
-        expect: () => [
-          const AuthLoading(),
-          const AuthError('Google sign in cancelled'),
-        ],
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in with Google...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
     });
 
     group('AuthSignInWithAppleRequested', () {
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthAuthenticated] on success',
+        'emits [AuthLoading, AuthAuthenticated] with NavigateToHome effect on success',
         build: () {
           mockSignInWithApple.setupSuccess(tUser);
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthSignInWithAppleRequested()),
-        expect: () => [
-          const AuthLoading(),
-          AuthAuthenticated(tUser),
-        ],
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in with Apple...'),
+              isA<AuthAuthenticated>()
+                  .having((s) => s.user, 'user', tUser)
+                  .having((s) => s.effect, 'effect', isA<NavigateGoEffect>()),
+            ],
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthError] on failure',
+        'emits [AuthLoading, AuthUnauthenticated] with ShowError effect on failure',
         build: () {
-          mockSignInWithApple.setupFailure(
-            const AuthFailure(message: 'Apple sign in not available'),
-          );
+          mockSignInWithApple.setupFailure(const AuthFailure(message: 'Apple sign in not available'));
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthSignInWithAppleRequested()),
-        expect: () => [
-          const AuthLoading(),
-          const AuthError('Apple sign in not available'),
-        ],
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing in with Apple...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
     });
 
     group('AuthRegisterWithEmailRequested', () {
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthAuthenticated] on success',
+        'emits [AuthLoading, AuthAuthenticated] with ShowSuccess effect on success',
         build: () {
           mockRegisterWithEmail.setupSuccess(tUser);
           return buildBloc();
         },
-        act: (bloc) => bloc.add(
-          const AuthRegisterWithEmailRequested(
-            email: tEmail,
-            password: tPassword,
-            name: tName,
-          ),
-        ),
-        expect: () => [
-          const AuthLoading(),
-          AuthAuthenticated(tUser),
-        ],
+        act: (bloc) => bloc.add(const AuthRegisterWithEmailRequested(email: tEmail, password: tPassword, name: tName)),
+        expect:
+            () => [
+              isAuthLoading(message: 'Creating account...'),
+              isA<AuthAuthenticated>()
+                  .having((s) => s.user, 'user', tUser)
+                  .having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthError] on failure',
+        'emits [AuthLoading, AuthUnauthenticated] with ShowError effect on failure',
         build: () {
-          mockRegisterWithEmail.setupFailure(
-            const AuthFailure(message: 'Email already in use'),
-          );
+          mockRegisterWithEmail.setupFailure(const AuthFailure(message: 'Email already in use'));
           return buildBloc();
         },
-        act: (bloc) => bloc.add(
-          const AuthRegisterWithEmailRequested(
-            email: tEmail,
-            password: tPassword,
-            name: tName,
-          ),
-        ),
-        expect: () => [
-          const AuthLoading(),
-          const AuthError('Email already in use'),
-        ],
+        act: (bloc) => bloc.add(const AuthRegisterWithEmailRequested(email: tEmail, password: tPassword, name: tName)),
+        expect:
+            () => [
+              isAuthLoading(message: 'Creating account...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
     });
 
     group('AuthSignOutRequested', () {
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthUnauthenticated] on success',
+        'emits [AuthLoading, AuthUnauthenticated] with NavigateToLogin effect on success',
         build: () {
           mockSignOut.setupSuccess();
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthSignOutRequested()),
-        expect: () => [
-          const AuthLoading(),
-          const AuthUnauthenticated(),
-        ],
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing out...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<NavigateGoEffect>()),
+            ],
       );
 
       blocTest<AuthBloc, AuthState>(
-        'emits [AuthLoading, AuthError] on failure',
+        'emits [AuthLoading, AuthUnauthenticated] with ShowError effect on failure',
         build: () {
-          mockSignOut.setupFailure(
-            const ServerFailure(message: 'Failed to sign out'),
-          );
+          mockSignOut.setupFailure(const ServerFailure(message: 'Failed to sign out'));
           return buildBloc();
         },
         act: (bloc) => bloc.add(const AuthSignOutRequested()),
-        expect: () => [
-          const AuthLoading(),
-          const AuthError('Failed to sign out'),
-        ],
+        expect:
+            () => [
+              isAuthLoading(message: 'Signing out...'),
+              isA<AuthUnauthenticated>().having((s) => s.effect, 'effect', isA<ShowSnackBarEffect>()),
+            ],
       );
     });
 
@@ -302,18 +279,14 @@ void main() {
         'emits [AuthAuthenticated] when user is added to stream',
         build: buildBloc,
         act: (bloc) => authStateController.add(tUser),
-        expect: () => [
-          AuthAuthenticated(tUser),
-        ],
+        expect: () => [isAuthAuthenticated(tUser)],
       );
 
       blocTest<AuthBloc, AuthState>(
         'emits [AuthUnauthenticated] when null is added to stream',
         build: buildBloc,
         act: (bloc) => authStateController.add(null),
-        expect: () => [
-          const AuthUnauthenticated(),
-        ],
+        expect: () => [isAuthUnauthenticated()],
       );
     });
 

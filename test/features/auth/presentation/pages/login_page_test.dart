@@ -77,18 +77,19 @@ void main() {
         expect(find.text('Test Credentials'), findsOneWidget);
       });
 
-      testWidgets('loading view with text when state is AuthLoading', (tester) async {
-        when(() => mockAuthBloc.state).thenReturn(const AuthLoading());
+      testWidgets('renders loading view with custom message when state is AuthLoading', (tester) async {
+        when(() => mockAuthBloc.state).thenReturn(const AuthLoading(message: 'Signing in...'));
         whenListen(
           mockAuthBloc,
           Stream<AuthState>.empty(),
-          initialState: const AuthLoading(),
+          initialState: const AuthLoading(message: 'Signing in...'),
         );
 
         await tester.pumpWidget(buildSubject());
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
-        expect(find.text('Signing in...'), findsOneWidget);
+        // The loading view shows the message from AuthLoading state
+        expect(find.textContaining('Signing in'), findsOneWidget);
       });
     });
 
@@ -171,6 +172,10 @@ void main() {
       testWidgets('dispatches AuthSignInWithGoogleRequested on tap', (tester) async {
         await tester.pumpWidget(buildSubject());
 
+        // Scroll to make Google button visible
+        await tester.ensureVisible(find.text('Continue with Google'));
+        await tester.pumpAndSettle();
+
         await tester.tap(find.text('Continue with Google'));
         await tester.pump();
 
@@ -203,23 +208,28 @@ void main() {
     });
 
     group('state listeners', () {
-      testWidgets('shows snackbar on AuthError', (tester) async {
-        const errorMessage = 'Invalid credentials';
-
+      // Note: Error handling is now done via EffectListener + global effect handlers.
+      // The snackbar is shown by effect_handlers.dart when AuthShowError effect is emitted.
+      // This test validates that the UI correctly transitions between states.
+      testWidgets('transitions from loading to form when auth fails', (tester) async {
+        when(() => mockAuthBloc.state).thenReturn(const AuthUnauthenticated());
         whenListen(
           mockAuthBloc,
           Stream<AuthState>.fromIterable([
-            const AuthError(errorMessage),
+            const AuthLoading(message: 'Signing in...'),
+            const AuthUnauthenticated(), // Error is shown via effect, state goes to Unauthenticated
           ]),
           initialState: const AuthInitial(),
         );
 
         await tester.pumpWidget(buildSubject());
-        await tester.pump(); // Process state change
-        await tester.pump(); // Let snackbar appear
+        await tester.pump(); // Process first state (AuthLoading)
+        await tester.pump(); // Process second state (AuthUnauthenticated)
+        await tester.pumpAndSettle();
 
-        expect(find.text(errorMessage), findsOneWidget);
-        expect(find.byType(SnackBar), findsOneWidget);
+        // Form should be visible again after auth failure
+        expect(find.text('Email'), findsOneWidget);
+        expect(find.text('Password'), findsOneWidget);
       });
     });
   });
