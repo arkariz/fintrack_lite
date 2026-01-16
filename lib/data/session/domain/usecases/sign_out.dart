@@ -7,6 +7,7 @@ import 'package:health_duel/data/session/domain/repositories/session_repository.
 /// Business logic for signing out current user.
 /// Can be used by any feature that needs to log out user.
 class SignOut {
+  // TODO: Refactor - Thin Use Case (see TECHNICAL_DEBT.md)
   final SessionRepository repository;
 
   const SignOut(this.repository);
