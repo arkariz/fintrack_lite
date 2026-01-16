@@ -17,6 +17,7 @@ abstract final class AppRoutes {
   // ═══════════════════════════════════════════════════════════════════════════
 
   static const home = '/home';
+  static const health = '/health';
   static const settings = '/settings';
   static const profile = '/profile';
 

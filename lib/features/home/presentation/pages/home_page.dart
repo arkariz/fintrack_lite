@@ -206,6 +206,8 @@ class _AuthenticatedView extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         _buildSuccessMessage(context, theme),
         const SizedBox(height: AppSpacing.lg),
+        _buildHealthCard(context, theme),
+        const SizedBox(height: AppSpacing.lg),
       ],
     );
   }
@@ -224,6 +226,8 @@ class _AuthenticatedView extends StatelessWidget {
             Expanded(child: _buildSuccessMessage(context, theme)),
           ],
         ),
+        const SizedBox(height: AppSpacing.lg),
+        _buildHealthCard(context, theme),
         const SizedBox(height: AppSpacing.xxl),
       ],
     );
@@ -342,6 +346,57 @@ class _AuthenticatedView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHealthCard(BuildContext context, ThemeData theme) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.read<HomeBloc>().add(const HomeNavigateToHealthRequested()),
+        child: Padding(
+          padding: EdgeInsets.all(context.responsiveValue(phone: 16.0, tablet: 20.0, desktop: 24.0)),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: AppRadius.mdBorder,
+                ),
+                child: Icon(
+                  Icons.favorite,
+                  color: theme.colorScheme.primary,
+                  size: context.responsiveValue(phone: 28.0, tablet: 32.0),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Step Counter',
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Track your daily steps',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withAlpha((255 * 0.7).round()),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurface.withAlpha((255 * 0.5).round()),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

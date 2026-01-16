@@ -27,6 +27,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeLoadUserRequested>(_onLoadUserRequested);
     on<HomeSignOutRequested>(_onSignOutRequested);
     on<HomeRefreshRequested>(_onRefreshRequested);
+    on<HomeNavigateToHealthRequested>(_onNavigateToHealthRequested);
   }
 
   /// Load current user data
@@ -52,7 +53,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             state.copyWith(
               status: HomeStatus.failure,
               errorMessage: 'Not authenticated',
-              effect: const NavigateGoEffect(route: '/login'),
+              effect: NavigateGoEffect(route: '/login'),
             ),
           );
         }
@@ -74,7 +75,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
       ),
       (_) => emit(
-        state.copyWith(status: HomeStatus.initial, clearUser: true, effect: const NavigateGoEffect(route: '/login')),
+        state.copyWith(status: HomeStatus.initial, clearUser: true, effect: NavigateGoEffect(route: '/login')),
       ),
     );
   }
@@ -99,5 +100,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       },
     );
+  }
+
+  /// Navigate to health feature
+  void _onNavigateToHealthRequested(HomeNavigateToHealthRequested event, Emitter<HomeState> emit) {
+    emit(state.withEffect(NavigatePushEffect(route: '/health')));
   }
 }

@@ -5,6 +5,7 @@ import 'package:health_duel/core/di/injection.dart';
 import 'package:health_duel/core/router/go_router_refresh.dart';
 import 'package:health_duel/core/router/routes.dart';
 import 'package:health_duel/features/auth/auth.dart';
+import 'package:health_duel/features/health/health.dart';
 import 'package:health_duel/features/home/home.dart';
 
 /// Creates GoRouter with auth-aware redirects
@@ -40,6 +41,11 @@ GoRouter createAppRouter(AuthBloc authBloc) {
         path: AppRoutes.home,
         name: 'home',
         builder: (_, __) => BlocProvider(create: (_) => getIt<HomeBloc>(), child: const HomePage()),
+      ),
+      GoRoute(
+        path: AppRoutes.health,
+        name: 'health',
+        builder: (_, __) => BlocProvider(create: (_) => getIt<HealthBloc>(), child: const HealthPage()),
       ),
     ],
   );
