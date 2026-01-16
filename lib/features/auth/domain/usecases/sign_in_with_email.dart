@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:health_duel/core/error/failures.dart';
-import 'package:health_duel/features/auth/domain/entities/user.dart';
+import 'package:health_duel/data/session/session.dart';
 import 'package:health_duel/features/auth/domain/repositories/auth_repository.dart';
 
 /// Sign In With Email Use Case
@@ -18,32 +18,20 @@ class SignInWithEmail {
   ///
   /// Possible failures:
   /// - [ValidationFailure]: Invalid email format or empty password
-  /// - [AuthenticationFailure]: Invalid credentials
   /// - [NetworkFailure]: No internet connection
   /// - [ServerFailure]: Firebase error
-  Future<Either<Failure, User>> call({
+  Future<Either<Failure, UserModel>> call({
     required String email,
     required String password,
   }) async {
     // Validate email format
-    final trimmedEmail = email.trim().toLowerCase();
-    if (!_isValidEmail(trimmedEmail)) {
-      return const Left(ValidationFailure(message: 'Invalid email format'));
-    }
-
-    // Validate password not empty
-    if (password.isEmpty) {
-      return const Left(ValidationFailure(message: 'Password cannot be empty'));
-    }
+    final user = User.login(email: email, password: password);
 
     // Delegate to repository
-    return repository.signInWithEmail(email: trimmedEmail, password: password);
-  }
-
-  bool _isValidEmail(String email) {
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    final result = await repository.signInWithEmail(
+      email: user.email,
+      password: user.password,
     );
-    return emailRegex.hasMatch(email);
+    return result;
   }
 }

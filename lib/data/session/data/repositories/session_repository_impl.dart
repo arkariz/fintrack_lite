@@ -3,7 +3,7 @@ import 'package:exception/exception.dart';
 import 'package:health_duel/core/error/exception_mapper.dart';
 import 'package:health_duel/core/error/failures.dart';
 import 'package:health_duel/data/session/data/datasources/session_data_source.dart';
-import 'package:health_duel/data/session/domain/entities/user.dart';
+import 'package:health_duel/data/session/data/models/user_model.dart';
 import 'package:health_duel/data/session/domain/repositories/session_repository.dart';
 
 /// Session Repository Implementation (Global Data Layer)
@@ -20,20 +20,22 @@ class SessionRepositoryImpl implements SessionRepository {
   final SessionDataSource _sessionDataSource;
 
   SessionRepositoryImpl({required SessionDataSource sessionDataSource})
-      : _sessionDataSource = sessionDataSource;
+    : _sessionDataSource = sessionDataSource;
 
   @override
-  Future<Either<Failure, User?>> getCurrentUser() async {
+  Future<Either<Failure, UserModel?>> getCurrentUser() async {
     try {
       final userModel = await _sessionDataSource.getCurrentUser();
-      return Right(userModel?.toEntity());
+      return Right(userModel);
     } on CoreException catch (e) {
       return Left(ExceptionMapper.toFailure(e));
     } catch (e) {
-      return Left(UnexpectedFailure(
-        message: 'An unexpected error occurred while getting current user',
-        originalException: e.toString(),
-      ));
+      return Left(
+        UnexpectedFailure(
+          message: 'An unexpected error occurred while getting current user',
+          originalException: e.toString(),
+        ),
+      );
     }
   }
 
@@ -45,17 +47,17 @@ class SessionRepositoryImpl implements SessionRepository {
     } on CoreException catch (e) {
       return Left(ExceptionMapper.toFailure(e));
     } catch (e) {
-      return Left(UnexpectedFailure(
-        message: 'An unexpected error occurred during sign out',
-        originalException: e.toString(),
-      ));
+      return Left(
+        UnexpectedFailure(
+          message: 'An unexpected error occurred during sign out',
+          originalException: e.toString(),
+        ),
+      );
     }
   }
 
   @override
-  Stream<User?> authStateChanges() {
-    return _sessionDataSource.authStateChanges().map((userModel) {
-      return userModel?.toEntity();
-    });
+  Stream<UserModel?> authStateChanges() {
+    return _sessionDataSource.authStateChanges();
   }
 }

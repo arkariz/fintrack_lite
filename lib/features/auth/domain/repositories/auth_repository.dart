@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:health_duel/core/error/failures.dart';
-import 'package:health_duel/features/auth/domain/entities/user.dart';
+import 'package:health_duel/data/session/data/models/user_model.dart';
 
 /// Authentication Repository Interface (Domain Layer)
 ///
@@ -11,27 +11,28 @@ import 'package:health_duel/features/auth/domain/entities/user.dart';
 abstract class AuthRepository {
   /// Sign in with email and password
   ///
-  /// Returns authenticated user on success or failure on error.
-  Future<Either<Failure, User>> signInWithEmail({
+  /// Returns UserModel (DTO) on success. Entity creation happens in use case.
+  Future<Either<Failure, UserModel>> signInWithEmail({
     required String email,
     required String password,
   });
 
   /// Sign in with Google account
   ///
-  /// Opens Google sign-in flow and returns authenticated user.
-  Future<Either<Failure, User>> signInWithGoogle();
+  /// Opens Google sign-in flow and returns UserModel (DTO).
+  Future<Either<Failure, UserModel>> signInWithGoogle();
 
   /// Sign in with Apple account (iOS only)
   ///
-  /// Opens Apple sign-in flow and returns authenticated user.
+  /// Opens Apple sign-in flow and returns UserModel (DTO).
   /// On Android, this will return an UnsupportedFailure.
-  Future<Either<Failure, User>> signInWithApple();
+  Future<Either<Failure, UserModel>> signInWithApple();
 
   /// Register new user with email and password
   ///
   /// Creates new Firebase Auth account and Firestore user document.
-  Future<Either<Failure, User>> registerWithEmail({
+  /// Returns UserModel (DTO). Entity creation happens in use case.
+  Future<Either<Failure, UserModel>> registerWithEmail({
     required String email,
     required String password,
     required String name,
@@ -42,14 +43,9 @@ abstract class AuthRepository {
   /// Clears Firebase Auth session and local cache.
   Future<Either<Failure, void>> signOut();
 
-  /// Get current authenticated user
-  ///
-  /// Returns user if session is valid, null if unauthenticated.
-  Future<Either<Failure, User?>> getCurrentUser();
-
   /// Stream of authentication state changes
   ///
-  /// Emits user on sign in, null on sign out.
+  /// Emits UserModel on sign in, null on sign out.
   /// Useful for reactive UI updates.
-  Stream<User?> authStateChanges();
+  Stream<UserModel?> authStateChanges();
 }

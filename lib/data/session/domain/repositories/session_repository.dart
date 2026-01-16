@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:health_duel/core/error/failures.dart';
-import 'package:health_duel/data/session/domain/entities/user.dart';
+import 'package:health_duel/data/session/data/models/user_model.dart';
 
 /// Session Repository Interface (Global Domain Layer)
 ///
@@ -14,8 +14,9 @@ import 'package:health_duel/data/session/domain/entities/user.dart';
 abstract class SessionRepository {
   /// Get current authenticated user
   ///
-  /// Returns [User] if session is valid, null if unauthenticated.
-  Future<Either<Failure, User?>> getCurrentUser();
+  /// Returns [UserModel] if session is valid, null if unauthenticated.
+  /// Entity creation happens in use case layer.
+  Future<Either<Failure, UserModel?>> getCurrentUser();
 
   /// Sign out current user
   ///
@@ -24,7 +25,7 @@ abstract class SessionRepository {
 
   /// Stream of authentication state changes
   ///
-  /// Emits [User] on sign in, null on sign out.
+  /// Emits [UserModel] on sign in, null on sign out.
   /// Useful for reactive UI updates across the app.
-  Stream<User?> authStateChanges();
+  Stream<UserModel?> authStateChanges();
 }

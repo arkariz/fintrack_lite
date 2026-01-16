@@ -17,13 +17,16 @@ import 'package:health_duel/features/home/presentation/bloc/home_state.dart';
 /// - [NavigateGoEffect] → For navigation after sign out
 /// - [ShowSnackBarEffect] → For error/success messages
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final GetCurrentUser _getCurrentUser;
+  final SessionRepository _sessionRepository;
   final SignOut _signOut;
 
-  HomeBloc({required GetCurrentUser getCurrentUser, required SignOut signOut})
-    : _getCurrentUser = getCurrentUser,
+  HomeBloc({
+    required SessionRepository sessionRepository, 
+    required SignOut signOut,
+  })
+    : _sessionRepository = sessionRepository,
       _signOut = signOut,
-      super(const HomeState()) {
+  super(const HomeState()) {
     on<HomeLoadUserRequested>(_onLoadUserRequested);
     on<HomeSignOutRequested>(_onSignOutRequested);
     on<HomeRefreshRequested>(_onRefreshRequested);
@@ -34,7 +37,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _onLoadUserRequested(HomeLoadUserRequested event, Emitter<HomeState> emit) async {
     emit(state.copyWith(status: HomeStatus.loading, loadingMessage: 'Loading your profile...', clearError: true));
 
-    final result = await _getCurrentUser();
+    final result = await _sessionRepository.getCurrentUser();
 
     result.fold(
       (failure) => emit(
@@ -83,7 +86,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Refresh user data (pull-to-refresh)
   Future<void> _onRefreshRequested(HomeRefreshRequested event, Emitter<HomeState> emit) async {
     // Keep current state while refreshing (no loading indicator)
-    final result = await _getCurrentUser();
+    final result = await _sessionRepository.getCurrentUser();
 
     result.fold(
       (failure) => emit(

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:health_duel/core/error/error.dart';
 
 /// User Entity (Global Domain Layer)
 ///
@@ -9,54 +10,54 @@ import 'package:equatable/equatable.dart';
 /// - Auth feature for authentication flows
 /// - Home feature for displaying user info
 /// - Any feature that needs user identity
-///
-/// Note: In Clean Architecture, entities should not depend on any framework
-/// (no Firebase, no JSON serialization, etc.)
 class User extends Equatable {
-  /// Unique user identifier from Firebase Auth
-  final String id;
-
-  /// User display name (from Firebase profile or email)
   final String name;
-
-  /// User email address
   final String email;
+  final String password;
 
-  /// Optional profile photo URL
-  final String? photoUrl;
-
-  /// User creation timestamp
-  final DateTime createdAt;
-
-  const User({
-    required this.id,
+  const User._({
     required this.name,
     required this.email,
-    this.photoUrl,
-    required this.createdAt,
+    required this.password,
   });
 
-  /// Check if user has a profile photo
-  bool get hasPhoto => photoUrl != null && photoUrl!.isNotEmpty;
+  factory User.login({
+    required String email,
+    required String password,
+  }) {
 
-  /// Get display name or fallback to email
-  String get displayName => name.isNotEmpty ? name : email.split('@').first;
+    if (!_isValidEmail(email)) throw const ValidationFailure(message: 'Invalid email format');
+    if (password.length < 6) throw const ValidationFailure(message: 'Password must be at least 6 characters');
+    return User._(
+      email: email,
+      password: password,
+      name: '',
+    );
+  }
 
-  /// Create empty user (for initial state)
-  factory User.empty() => User(
-        id: '',
-        name: '',
-        email: '',
-        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
-      );
+  factory User.register({
+    required String email,
+    required String password,
+    required String name,
+  }) {
+    if (!_isValidEmail(email)) throw const ValidationFailure(message: 'Invalid email format');
+    if (password.length < 6) throw const ValidationFailure(message: 'Password must be at least 6 characters');
+    if (name.trim().isEmpty) throw const ValidationFailure(message: 'Name cannot be empty');
+    return User._(
+      email: email,
+      password: password,
+      name: name,
+    );
+  }
 
-  /// Check if user is empty/invalid
-  bool get isEmpty => id.isEmpty;
-  bool get isNotEmpty => id.isNotEmpty;
+  static bool _isValidEmail(String email) {
+    final trimmedEmail = email.trim().toLowerCase();
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(trimmedEmail);
+  }
 
   @override
-  List<Object?> get props => [id, name, email, photoUrl, createdAt];
-
-  @override
-  String toString() => 'User(id: $id, name: $name, email: $email)';
+  List<Object?> get props => [name, email, password];
 }

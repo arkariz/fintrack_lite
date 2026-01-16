@@ -12,7 +12,7 @@ void registerHomeModule(GetIt getIt) {
   // ═══════════════════════════════════════════════════════════════════════
   getIt.registerFactory<HomeBloc>(
     () => HomeBloc(
-      getCurrentUser: getIt<GetCurrentUser>(),
+      sessionRepository: getIt<SessionRepository>(),
       signOut: getIt<SignOut>(),
     ),
   );

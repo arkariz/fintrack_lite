@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_duel/core/presentation/widgets/widgets.dart';
 import 'package:health_duel/core/theme/theme.dart';
-import 'package:health_duel/data/session/domain/domain.dart';
+import 'package:health_duel/data/session/session.dart';
 import 'package:health_duel/features/home/home.dart';
 
 /// Home Page - Shows authenticated user info with responsive design
@@ -48,7 +48,7 @@ class HomePage extends StatelessWidget {
                     (context, state) => switch (state.status) {
                       HomeStatus.initial => const _InitialView(),
                       HomeStatus.loading => _LoadingView(message: state.loadingMessage),
-                      HomeStatus.loaded => state.hasUser ? _AuthenticatedView(user: state.user!) : const _InitialView(),
+                      HomeStatus.loaded => state.user != null ? _AuthenticatedView(user: state.user!) : const _InitialView(),
                       HomeStatus.failure => _ErrorView(message: state.errorMessage ?? 'Unknown error'),
                     },
               ),
@@ -169,7 +169,7 @@ class _ErrorView extends StatelessWidget {
 class _AuthenticatedView extends StatelessWidget {
   const _AuthenticatedView({required this.user});
 
-  final User user;
+  final UserModel user;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +280,7 @@ class _AuthenticatedView extends StatelessWidget {
             ),
             const Divider(height: 24),
             _buildDetailRow(context, 'ID', user.id),
-            _buildDetailRow(context, 'Display Name', user.displayName),
+            _buildDetailRow(context, 'Display Name', user.name),
             _buildDetailRow(context, 'Created', _formatDate(user.createdAt)),
             _buildDetailRow(context, 'Photo URL', user.photoUrl ?? 'None'),
           ],

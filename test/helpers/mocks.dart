@@ -11,6 +11,7 @@ import 'package:dartz/dartz.dart';
 import 'package:health_duel/core/error/failures.dart';
 import 'package:health_duel/core/presentation/widgets/connectivity/connectivity.dart';
 import 'package:health_duel/data/session/domain/domain.dart';
+import 'package:health_duel/data/session/data/models/user_model.dart';
 import 'package:health_duel/features/auth/domain/repositories/auth_repository.dart';
 import 'package:health_duel/features/auth/domain/usecases/register_with_email.dart';
 import 'package:health_duel/features/auth/domain/usecases/sign_in_with_apple.dart';
@@ -27,6 +28,8 @@ import 'package:mocktail/mocktail.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
+class MockSessionRepository extends Mock implements SessionRepository {}
+
 class MockSignInWithEmail extends Mock implements SignInWithEmail {}
 
 class MockSignInWithGoogle extends Mock implements SignInWithGoogle {}
@@ -36,8 +39,6 @@ class MockSignInWithApple extends Mock implements SignInWithApple {}
 class MockRegisterWithEmail extends Mock implements RegisterWithEmail {}
 
 class MockSignOut extends Mock implements SignOut {}
-
-class MockGetCurrentUser extends Mock implements GetCurrentUser {}
 
 /// Mock AuthBloc for widget testing
 ///
@@ -79,11 +80,15 @@ void registerFallbackValues() {
   registerFallbackValue(Right<Failure, User>(FakeUser()));
   registerFallbackValue(const Right<Failure, User?>(null));
   registerFallbackValue(const Right<Failure, void>(null));
-  registerFallbackValue(const Left<Failure, User>(AuthFailure(message: 'test')));
+  registerFallbackValue(
+    const Left<Failure, User>(AuthFailure(message: 'test')),
+  );
 
   // Auth Events
   registerFallbackValue(const AuthCheckRequested());
-  registerFallbackValue(const AuthSignInWithEmailRequested(email: '', password: ''));
+  registerFallbackValue(
+    const AuthSignInWithEmailRequested(email: '', password: ''),
+  );
   registerFallbackValue(const AuthSignInWithGoogleRequested());
   registerFallbackValue(const AuthSignOutRequested());
 
@@ -100,28 +105,24 @@ class FakeUser extends Fake implements User {}
 
 extension MockAuthRepositoryX on MockAuthRepository {
   /// Setup auth state stream with provided controller
-  void setupAuthStateChanges(StreamController<User?> controller) {
+  void setupAuthStateChanges(StreamController<UserModel?> controller) {
     when(() => authStateChanges()).thenAnswer((_) => controller.stream);
   }
+}
 
-  /// Setup getCurrentUser to return user
-  void setupGetCurrentUser(User? user) {
-    when(() => getCurrentUser()).thenAnswer(
-      (_) async => Right(user),
-    );
+extension MockSessionRepositoryX on MockSessionRepository {
+  void setupGetCurrentUser(UserModel? userModel) {
+    when(() => getCurrentUser()).thenAnswer((_) async => Right(userModel));
   }
 
-  /// Setup getCurrentUser to return failure
-  void setupGetCurrentUserFailure(Failure failure) {
-    when(() => getCurrentUser()).thenAnswer(
-      (_) async => Left(failure),
-    );
+  void setupFailure(Failure failure) {
+    when(() => getCurrentUser()).thenAnswer((_) async => Left(failure));
   }
 }
 
 extension MockSignInWithEmailX on MockSignInWithEmail {
   /// Setup successful sign in
-  void setupSuccess(User user) {
+  void setupSuccess(UserModel user) {
     when(
       () => call(email: any(named: 'email'), password: any(named: 'password')),
     ).thenAnswer((_) async => Right(user));
@@ -136,7 +137,7 @@ extension MockSignInWithEmailX on MockSignInWithEmail {
 }
 
 extension MockSignInWithGoogleX on MockSignInWithGoogle {
-  void setupSuccess(User user) {
+  void setupSuccess(UserModel user) {
     when(() => call()).thenAnswer((_) async => Right(user));
   }
 
@@ -146,7 +147,7 @@ extension MockSignInWithGoogleX on MockSignInWithGoogle {
 }
 
 extension MockSignInWithAppleX on MockSignInWithApple {
-  void setupSuccess(User user) {
+  void setupSuccess(UserModel user) {
     when(() => call()).thenAnswer((_) async => Right(user));
   }
 
@@ -156,7 +157,7 @@ extension MockSignInWithAppleX on MockSignInWithApple {
 }
 
 extension MockRegisterWithEmailX on MockRegisterWithEmail {
-  void setupSuccess(User user) {
+  void setupSuccess(UserModel user) {
     when(
       () => call(
         email: any(named: 'email'),
@@ -180,16 +181,6 @@ extension MockRegisterWithEmailX on MockRegisterWithEmail {
 extension MockSignOutX on MockSignOut {
   void setupSuccess() {
     when(() => call()).thenAnswer((_) async => const Right(null));
-  }
-
-  void setupFailure(Failure failure) {
-    when(() => call()).thenAnswer((_) async => Left(failure));
-  }
-}
-
-extension MockGetCurrentUserX on MockGetCurrentUser {
-  void setupSuccess(User? user) {
-    when(() => call()).thenAnswer((_) async => Right(user));
   }
 
   void setupFailure(Failure failure) {

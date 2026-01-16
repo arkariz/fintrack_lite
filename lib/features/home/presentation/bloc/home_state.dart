@@ -1,18 +1,18 @@
 import 'package:health_duel/core/bloc/bloc.dart';
-import 'package:health_duel/data/session/domain/domain.dart';
+import 'package:health_duel/data/session/session.dart';
 
 /// Home feature status
 enum HomeStatus {
   /// Initial state, waiting for data load
   initial,
 
-  /// Loading user data
+  /// Loading userModel data
   loading,
 
-  /// User data loaded successfully
+  /// UserModel data loaded successfully
   loaded,
 
-  /// Failed to load user data
+  /// Failed to load userModel data
   failure,
 }
 
@@ -26,7 +26,7 @@ enum HomeStatus {
 /// RENDERABLE DATA (UI displays these) - Included in [props]
 /// ═══════════════════════════════════════════════════════════════════
 /// - [status] - Current loading/error status
-/// - [user] - Authenticated user data
+/// - [user] - Authenticated userModel data
 /// - [errorMessage] - Error message to display
 /// - [loadingMessage] - Optional loading message
 ///
@@ -43,8 +43,8 @@ class HomeState extends UiState with EffectClearable<HomeState> {
   /// Current status of home feature
   final HomeStatus status;
 
-  /// Authenticated user (null when not loaded or error)
-  final User? user;
+  /// Authenticated userModel (null when not loaded or error)
+  final UserModel? user;
 
   /// Error message when status is failure
   final String? errorMessage;
@@ -71,7 +71,7 @@ class HomeState extends UiState with EffectClearable<HomeState> {
 
   HomeState copyWith({
     HomeStatus? status,
-    User? user,
+    UserModel? user,
     String? errorMessage,
     String? loadingMessage,
     UiEffect? effect,
@@ -105,5 +105,5 @@ class HomeState extends UiState with EffectClearable<HomeState> {
   bool get isLoading => status == HomeStatus.loading;
   bool get isLoaded => status == HomeStatus.loaded;
   bool get isFailure => status == HomeStatus.failure;
-  bool get hasUser => user != null;
+  bool get hasUserModel => user != null;
 }

@@ -6,7 +6,6 @@ import 'package:health_duel/data/session/domain/domain.dart';
 ///
 /// Registers global session management dependencies:
 /// - [SessionRepository] implementation
-/// - [GetCurrentUser] use case
 /// - [SignOut] use case
 ///
 /// Must be called after auth module registers [SessionDataSource].
@@ -24,10 +23,6 @@ void registerSessionModule(GetIt getIt) {
   // ═══════════════════════════════════════════════════════════════════════════
   // Use Cases
   // ═══════════════════════════════════════════════════════════════════════════
-
-  getIt.registerFactory<GetCurrentUser>(
-    () => GetCurrentUser(getIt<SessionRepository>()),
-  );
 
   getIt.registerFactory<SignOut>(
     () => SignOut(getIt<SessionRepository>()),

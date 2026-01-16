@@ -3,14 +3,14 @@
 /// Provides reusable test objects for unit and widget tests.
 library;
 
-import 'package:health_duel/features/auth/domain/entities/user.dart';
+import 'package:health_duel/data/session/data/models/user_model.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // User Fixtures
 // ═══════════════════════════════════════════════════════════════════════════
 
-/// Standard test user
-final tUser = User(
+/// Standard test user model (DTO)
+final tUserModel = UserModel(
   id: 'test-user-123',
   name: 'Test User',
   email: 'test@email.com',
@@ -19,7 +19,7 @@ final tUser = User(
 );
 
 /// User without photo
-final tUserNoPhoto = User(
+final tUserNoPhoto = UserModel(
   id: 'test-user-456',
   name: 'No Photo User',
   email: 'nophoto@example.com',
@@ -28,7 +28,7 @@ final tUserNoPhoto = User(
 );
 
 /// User with empty name (fallback to email)
-final tUserNoName = User(
+final tUserNoName = UserModel(
   id: 'test-user-789',
   name: '',
   email: 'noname@example.com',

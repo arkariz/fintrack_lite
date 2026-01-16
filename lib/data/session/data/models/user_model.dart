@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:health_duel/data/session/domain/entities/user.dart';
 
 /// User Model (Global Data Layer - Firestore DTO)
 ///
@@ -50,37 +49,19 @@ class UserModel extends Equatable {
   ///
   /// Note: ID is not included as it's the document ID, not a field.
   Map<String, dynamic> toFirestore() => {
-        'name': name,
-        'email': email,
-        'photoUrl': photoUrl,
-        'createdAt': Timestamp.fromDate(createdAt),
-      };
-
-  /// Convert to domain entity
-  User toEntity() => User(
-        id: id,
-        name: name,
-        email: email,
-        photoUrl: photoUrl,
-        createdAt: createdAt,
-      );
-
-  /// Create from domain entity (for updates)
-  factory UserModel.fromEntity(User user) => UserModel(
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        photoUrl: user.photoUrl,
-        createdAt: user.createdAt,
-      );
+    'name': name,
+    'email': email,
+    'photoUrl': photoUrl,
+    'createdAt': Timestamp.fromDate(createdAt),
+  };
 
   /// Create empty model
   factory UserModel.empty() => UserModel(
-        id: '',
-        name: '',
-        email: '',
-        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
-      );
+    id: '',
+    name: '',
+    email: '',
+    createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+  );
 
   @override
   List<Object?> get props => [id, name, email, photoUrl, createdAt];

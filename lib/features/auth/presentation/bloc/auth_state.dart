@@ -1,5 +1,5 @@
 import 'package:health_duel/core/bloc/bloc.dart';
-import 'package:health_duel/features/auth/domain/entities/user.dart';
+import 'package:health_duel/data/session/session.dart';
 
 /// Auth State - Represents current authentication status
 ///
@@ -45,7 +45,7 @@ class AuthLoading extends AuthState {
 
 /// User is authenticated with valid session
 class AuthAuthenticated extends AuthState {
-  final User user;
+  final UserModel user;
 
   const AuthAuthenticated(this.user, {super.effect});
 

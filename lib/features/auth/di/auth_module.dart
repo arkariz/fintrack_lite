@@ -94,12 +94,12 @@ void registerAuthModule() {
   getIt.registerLazySingleton<AuthBloc>(
     () => AuthBloc(
       authRepository: getIt<AuthRepository>(),
+      sessionRepository: getIt<SessionRepository>(),
       signInWithEmail: getIt<SignInWithEmail>(),
       signInWithGoogle: getIt<SignInWithGoogle>(),
       signInWithApple: getIt<SignInWithApple>(),
       registerWithEmail: getIt<RegisterWithEmail>(),
       signOut: getIt<SignOut>(),
-      getCurrentUser: getIt<GetCurrentUser>(),
     ),
   );
 }
