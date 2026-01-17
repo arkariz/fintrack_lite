@@ -49,22 +49,25 @@ class _HealthPageState extends State<HealthPage> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            // Offline banner
-            const AnimatedOfflineBanner(),
-
-            // Main content
-            Expanded(
-              child: BlocBuilder<HealthBloc, HealthState>(
-                buildWhen: (p, c) =>
-                  p.isLoading != c.isLoading ||
-                  p.todaySteps != c.todaySteps ||
-                  p.isRefreshing != c.isRefreshing,
-                builder: (context, state) => _buildContent(context, state),
+        body: RefreshIndicator(
+          onRefresh: () async => context.read<HealthBloc>().add(const HealthRefreshRequested()),
+          child: Column(
+            children: [
+              // Offline banner
+              const AnimatedOfflineBanner(),
+          
+              // Main content
+              Expanded(
+                child: BlocBuilder<HealthBloc, HealthState>(
+                  buildWhen: (p, c) =>
+                    p.isLoading != c.isLoading ||
+                    p.todaySteps != c.todaySteps ||
+                    p.isRefreshing != c.isRefreshing,
+                  builder: (context, state) => _buildContent(context, state),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

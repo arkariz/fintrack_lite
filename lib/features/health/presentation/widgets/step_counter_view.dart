@@ -91,8 +91,9 @@ class StepCounterView extends StatelessWidget {
 
               // Last updated time
               const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Updated ${_formatTime(stepCount.endTime)}',
+              LiveTimeAgoText(
+                stepCount.endTime,
+                prefix: 'Updated ',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withAlpha((255 * 0.5).round()),
                 ),
@@ -104,15 +105,7 @@ class StepCounterView extends StatelessWidget {
     );
   }
 
-  String _formatTime(DateTime time) {
-    final now = DateTime.now();
-    final diff = now.difference(time);
 
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
-  }
 }
 
 /// Step Counter Ring Widget
